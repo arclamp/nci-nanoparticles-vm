@@ -1,0 +1,111 @@
+---
+- hosts: all
+  become_user: root
+  become_method: sudo
+
+  tasks:
+    - name: Add Mongo repository key
+      become: yes
+      shell: apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+         
+    - name: Set Mongo package list
+      become: yes
+      shell: echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-3.0.list
+
+    - name: Pull in latest Node package files
+      become: yes
+      shell: curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+
+    - name: Ensure Python packages are installed
+      become: yes
+      apt:
+        name:
+          - python
+          - python-dev
+          - python-pip
+          - git
+          - nodejs
+          - mongodb-org
+          - libcairo2-dev
+          - libjpeg8-dev
+          - libpango1.0-dev
+          - libgif-dev
+          - libffi-dev
+          - build-essential
+          - g++
+
+    - name: Update pip
+      become: yes
+      shell: curl https://raw.github.com/pypa/pip/master/contrib/get-pip.py | python
+
+    - name: Update NPM to latest version
+      become: yes
+      command: npm i -g npm
+
+    - name: Clone Girder repository
+      git:
+        repo: https://github.com/girder/girder
+        dest: girder
+        version: e26eb8f72e0a08c771219a14941403a7f1c2a32d
+
+    - name: Clone Girder DB Items repository
+      git:
+        repo: https://github.com/OpenGeoscience/girder_db_items
+        dest: girder/plugins/girder_db_items
+        version: 9089927fecf38e0830ff4c83a85e2535f32346f8
+
+    - name: Clone Candela repository
+      git:
+        repo: https://github.com/Kitware/candela
+        dest: candela
+        version: 91e7821b99757b4ce366a3e0f339e305aca109c0
+
+    - name: Ensure Resonant Laboratory is symlinked to Girder plugin directory
+      file:
+        src: ~/candela/app/resonant-laboratory
+        dest: ~/girder/plugins/resonant-laboratory
+        state: link
+
+    - name: Install Resonant Lab node requirements
+      command: npm i
+      args:
+        chdir: candela
+        creates: node_modules
+ 
+    - name: Build Resonant Lab
+      command: npm run build:laboratory
+      args:
+        chdir: candela
+
+    - name: Install Girder node requirements
+      command: npm i
+      args:
+        chdir: girder
+        creates: node_modules
+
+    - name: Ensure packages needed for Girder are installed
+      become: yes
+      command: pip install -r requirements.txt
+      args:
+        chdir: girder
+
+    - name: Ensure packages needed for Girder build are installed
+      become: yes
+      command: pip install -r requirements-dev.txt
+      args:
+        chdir: girder
+
+    - name: Build Girder
+      command: ./node_modules/.bin/grunt
+      args:
+        chdir: girder
+
+    - name: Start MongoDB
+      service:
+          name: mongod
+          state: started
+
+    - name: Run Girder
+      command: python -m girder
+      args:
+          chdir: girder
