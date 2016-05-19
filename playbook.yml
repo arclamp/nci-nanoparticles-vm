@@ -179,3 +179,14 @@
           root: /opt/girder
           current: true
         state: present
+
+    - name: Copy sample data
+      copy:
+        src: files/sample-data
+        dest: /home/vagrant
+        owner: vagrant
+
+    - name: Install sample data
+      command: python populate.py
+      args:
+        chdir: sample-data
