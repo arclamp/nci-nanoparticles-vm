@@ -151,6 +151,7 @@
         password: adminadmin
         plugins:
           - resonant-laboratory
+          - girder_db_items
         state: present
 
     - name: Restart Girder
