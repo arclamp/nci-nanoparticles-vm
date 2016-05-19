@@ -104,7 +104,77 @@
           name: mongod
           state: started
 
-    - name: Run Girder
-      command: python -m girder
-      args:
-          chdir: girder
+    - name: Install girder_client
+      become: yes
+      pip:
+        chdir: /home/vagrant/girder/clients/python
+        extra_args: -e
+        name: .
+      become_user: root
+
+    - name: Install Girder as service
+      become: yes
+      copy:
+        src: files/girder.conf
+        dest: /etc/init/girder.conf
+        mode: 644
+        owner: root
+
+    - name: Start Girder
+      become: yes
+      service:
+        name: girder
+        state: started
+        enabled: yes
+
+    - name: Wait for Girder to start
+      wait_for:
+        port: 8080
+        delay: 1
+
+    - name: Create Girder admin user
+      girder:
+        port: 8080
+        user:
+          firstName: Admin
+          lastName: User
+          login: admin
+          password: adminadmin
+          email: admin@example.com
+          admin: yes
+        state: present
+
+    - name: Activate Resonant Laboratory
+      girder:
+        port: 8080
+        username: admin
+        password: adminadmin
+        plugins:
+          - resonant-laboratory
+        state: present
+
+    - name: Restart Girder
+      girder:
+        port: 8080
+        username: admin
+        password: adminadmin
+        put:
+          path: system/restart
+
+    - name: Wait for Girder to restart
+      wait_for:
+        port: 8080
+        delay: 5
+      tags: girder
+
+    - name: Create filesystem assetstore
+      girder:
+        port: 8080
+        username: admin
+        password: adminadmin
+        assetstore:
+          name: Filesystem Assetstore
+          type: filesystem
+          root: /opt/girder
+          current: true
+        state: present
