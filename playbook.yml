@@ -6,11 +6,11 @@
   tasks:
     - name: Add Mongo repository key
       become: yes
-      shell: apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+      shell: apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
          
     - name: Set Mongo package list
       become: yes
-      shell: echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-3.0.list
+      shell: echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-3.2.list
 
     - name: Pull in latest Node package files
       become: yes
@@ -54,7 +54,7 @@
       git:
         repo: https://github.com/OpenGeoscience/girder_db_items
         dest: girder/plugins/girder_db_items
-        version: 9089927fecf38e0830ff4c83a85e2535f32346f8
+        version: 643faa0227df605741584a008dbc7cf338a14a0e
 
     - name: Install Girder DB Items requirements
       become: yes
@@ -66,7 +66,7 @@
       git:
         repo: https://github.com/Kitware/candela
         dest: candela
-        version: 91e7821b99757b4ce366a3e0f339e305aca109c0
+        version: 9d7b9f58a6a157a9ac41488f4a85aa5bd1f25024
 
     - name: Ensure Resonant Laboratory is symlinked to Girder plugin directory
       file:
@@ -206,8 +206,13 @@
           dest: /home/vagrant
           creates: dump
 
+    - name: Copy nanoparticle data (csv)
+      copy:
+          src: files/nano-0516-filled.csv
+          dest: /home/vagrant
+
     - name: Ingest nanoparticle data
-      command: mongorestore
+      command: mongoimport --drop -d NanoDB3 -c Nano_combined_0301_filled --file=nano-0516-filled.csv --type=csv --headerline
 
     - name: Copy database activation script
       copy:
