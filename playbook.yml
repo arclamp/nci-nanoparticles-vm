@@ -206,8 +206,13 @@
           dest: /home/vagrant
           creates: dump
 
+    - name: Copy nanoparticle data (csv)
+      copy:
+          src: files/nano-0516-filled.csv
+          dest: /home/vagrant
+
     - name: Ingest nanoparticle data
-      command: mongorestore
+      command: mongoimport --drop -d NanoDB3 -c Nano_combined_0301_filled --file=nano-0516-filled.csv --type=csv --headerline
 
     - name: Copy database activation script
       copy:
