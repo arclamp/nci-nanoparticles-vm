@@ -54,7 +54,7 @@
       git:
         repo: https://github.com/OpenGeoscience/girder_db_items
         dest: girder/plugins/girder_db_items
-        version: 9089927fecf38e0830ff4c83a85e2535f32346f8
+        version: 643faa0227df605741584a008dbc7cf338a14a0e
 
     - name: Install Girder DB Items requirements
       become: yes
@@ -66,7 +66,7 @@
       git:
         repo: https://github.com/Kitware/candela
         dest: candela
-        version: 91e7821b99757b4ce366a3e0f339e305aca109c0
+        version: 9d7b9f58a6a157a9ac41488f4a85aa5bd1f25024
 
     - name: Ensure Resonant Laboratory is symlinked to Girder plugin directory
       file:
