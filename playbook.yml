@@ -6,11 +6,11 @@
   tasks:
     - name: Add Mongo repository key
       become: yes
-      shell: apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+      shell: apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
          
     - name: Set Mongo package list
       become: yes
-      shell: echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-3.0.list
+      shell: echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-3.2.list
 
     - name: Pull in latest Node package files
       become: yes
