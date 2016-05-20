@@ -16,7 +16,7 @@
       become: yes
       shell: curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 
-    - name: Ensure Python packages are installed
+    - name: Ensure APT packages are installed
       become: yes
       apt:
         name:
@@ -32,6 +32,9 @@
           - libffi-dev
           - build-essential
           - g++
+          - postgresql
+          - postgresql-contrib
+          - libpq-dev
 
     - name: Update pip
       become: yes
@@ -52,6 +55,12 @@
         repo: https://github.com/OpenGeoscience/girder_db_items
         dest: girder/plugins/girder_db_items
         version: 9089927fecf38e0830ff4c83a85e2535f32346f8
+
+    - name: Install Girder DB Items requirements
+      become: yes
+      command: pip install -r requirements.txt
+      args:
+        chdir: girder/plugins/girder_db_items
 
     - name: Clone Candela repository
       git:
@@ -190,3 +199,20 @@
       command: python populate.py
       args:
         chdir: sample-data
+
+    - name: Copy nanoparticle data
+      unarchive:
+          src: files/nano-table-0516.tar.gz
+          dest: /home/vagrant
+          creates: dump
+
+    - name: Ingest nanoparticle data
+      command: mongorestore
+
+    - name: Copy database activation script
+      copy:
+          src: files/createDBItem.py
+          dest: /home/vagrant
+
+    - name: Create public item for nanoparticle data
+      command: python createDBItem.py
