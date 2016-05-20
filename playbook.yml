@@ -190,3 +190,12 @@
       command: python populate.py
       args:
         chdir: sample-data
+
+    - name: Copy nanoparticle data
+      unarchive:
+          src: files/nano-table-0516.tar.gz
+          dest: /home/vagrant
+          creates: dump
+
+    - name: Ingest nanoparticle data
+      command: mongorestore
