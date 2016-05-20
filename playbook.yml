@@ -208,3 +208,11 @@
 
     - name: Ingest nanoparticle data
       command: mongorestore
+
+    - name: Copy database activation script
+      copy:
+          src: files/createDBItem.py
+          dest: /home/vagrant
+
+    - name: Create public item for nanoparticle data
+      command: python createDBItem.py
