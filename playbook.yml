@@ -229,8 +229,13 @@
         dest: pdf2csv
         version: 582be2d2b551baa7bfbdf42d50f0f586d340eb61
 
+    # create a virtualenv for tangelo to run inside
+    - name: Manually create initial virtualenv
+      command:  virtualenv /home/vagrant/venvs/tangelo-venv -p python2.7 creates="/home/vagrant/venvs/tangelo-venv"
+
     - name: Ensure packages needed for pdf2csv app are installed
       become: yes
-      command: pip install -r requirements.txt
-      args:
-        chdir: pdf2csv
+      pip:
+        requirements: /home/vagrant/pdf2csv/requirements.txt
+        virtualenv: /home/vagrant/venvs/tangelo-venv
+        virtualenv_python: python2.7
