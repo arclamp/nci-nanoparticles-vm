@@ -221,3 +221,16 @@
 
     - name: Create public item for nanoparticle data
       command: python createDBItem.py
+
+    # now install the pdf2csv app which extracts tables from PDF files
+    - name: clone pdf2csv repository
+      git:
+        repo: https://github.com/curtislisle/nanomaterial-pdf2csv.git
+        dest: pdf2csv
+        version: 582be2d2b551baa7bfbdf42d50f0f586d340eb61
+
+    - name: Ensure packages needed for pdf2csv app are installed
+      become: yes
+      command: pip install -r requirements.txt
+      args:
+        chdir: pdf2csv
