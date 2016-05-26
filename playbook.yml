@@ -35,6 +35,7 @@
           - postgresql
           - postgresql-contrib
           - libpq-dev
+          - openjdk-7-jre
 
     - name: Update pip
       become: yes
@@ -66,7 +67,6 @@
       git:
         repo: https://github.com/Kitware/candela
         dest: candela
-        version: 9d7b9f58a6a157a9ac41488f4a85aa5bd1f25024
 
     - name: Ensure Resonant Laboratory is symlinked to Girder plugin directory
       file:
@@ -222,6 +222,16 @@
     - name: Create public item for nanoparticle data
       command: python createDBItem.py
 
+    #------------------------------------------------------
+    # below is install of pdf2csv tangelo app.  It requires Java, a clone of the source code, and runs inside its own virtualenv
+    #------------------------------------------------------
+
+    - name: Ensure APT packages are installed
+      become: yes
+      apt:
+        name:
+          - openjdk-7-jre
+
     # now install the pdf2csv app which extracts tables from PDF files
     - name: clone pdf2csv repository
       git:
@@ -234,8 +244,16 @@
       command:  virtualenv /home/vagrant/venvs/tangelo-venv -p python2.7 creates="/home/vagrant/venvs/tangelo-venv"
 
     - name: Ensure packages needed for pdf2csv app are installed
-      become: yes
       pip:
         requirements: /home/vagrant/pdf2csv/requirements.txt
         virtualenv: /home/vagrant/venvs/tangelo-venv
         virtualenv_python: python2.7
+
+# Use virtualenv to run app
+#- hosts: all
+#  vars:
+#    ansible_python_interpreter: "/home/vagrant/venvs/tangelo-venv/bin/python2.7"
+#  tasks:
+#    - name: Run Tangelo application program
+#      shell: "/home/vagrant/pdf2csv/pdfTable2csv &"
+
