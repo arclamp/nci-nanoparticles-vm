@@ -66,7 +66,7 @@
       git:
         repo: https://github.com/Kitware/candela
         dest: candela
-        version: 9d7b9f58a6a157a9ac41488f4a85aa5bd1f25024
+        version: 671df6bdd60dc9793674a00c7b24366516d9ad5b
 
     - name: Ensure Resonant Laboratory is symlinked to Girder plugin directory
       file:
